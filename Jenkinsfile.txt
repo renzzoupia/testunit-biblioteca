@@ -6,11 +6,12 @@ node {
 
     stage('Clonar el proyecto'){
         git branch: 'main', url: 'https://github.com/renzzoupia/testunit-biblioteca.git'
+        mvnHome = tool 'MAVEN'
     }
 
     stage('Ejecutar Test Unit'){
         try{
-            sh 'mvn clean test'
+            sh "'${mvnHome}/bin/mvn' clean test'"
         } catch(e){
             notifyStarted("Error test unit")
             throw e
