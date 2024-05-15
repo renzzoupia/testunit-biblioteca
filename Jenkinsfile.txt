@@ -1,12 +1,13 @@
-pipeline{
-    agent any
-    tools {
-        mvn 'MAVEN'
-    }
+node {
+    //agent any
+    //tools {
+    //    mvn 'MAVEN'
+    //}
 
     stage('Clonar el proyecto'){
         git branch: 'main', url: 'https://github.com/renzzoupia/testunit-biblioteca.git'
     }
+
     stage('Ejecutar Test Unit'){
         try{
             sh 'mvn clean test'
@@ -32,11 +33,11 @@ pipeline{
             throw e
         }
     }
+}
 
-    def notifyStarted(String message) {
+def notifyStarted(String message) {
         slackSend (
             color: '#FFFF00',
             message: "${message}: JOB '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         )
-    }
 }
