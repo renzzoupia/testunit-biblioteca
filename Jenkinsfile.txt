@@ -1,0 +1,42 @@
+pipeline{
+    agent any
+    tools {
+        mvn 'MAVEN'
+    }
+
+    stage('Clonar el proyecto'){
+        git branch: 'main', url: 'https://github.com/renzzoupia/testunit-biblioteca.git'
+    }
+    stage('Ejecutar Test Unit'){
+        try{
+            sh 'mvn clean test'
+        } catch(e){
+            notifyStarted("Error test unit")
+            throw e
+        }
+    }
+
+    stage('Build'){
+        try{
+            sh 'mvn clean package -DskipTests'
+        } catch(e){
+            notifyStarted("Error packaget")
+            throw e
+        }
+    }
+    stage('Result'){
+        try {
+            archive 'target/*.jar'
+        } catch(e){
+            notifyStarted("Error packaging failed in Jenkins")
+            throw e
+        }
+    }
+
+    def notifyStarted(String message) {
+        slackSend (
+            color: '#FFFF00',
+            message: "${message}: JOB '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+        )
+    }
+}
